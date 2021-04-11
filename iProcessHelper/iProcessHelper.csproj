@@ -84,8 +84,10 @@
     <Compile Include="JsonProcessModel\ProcessModelMetadata.cs" />
     <Compile Include="JsonProcessModel\ProcessModelSchema.cs" />
     <Compile Include="Models\EntitySignal.cs" />
+    <Compile Include="Models\FilterField.cs" />
     <Compile Include="Models\FilterObject.cs" />
     <Compile Include="Models\FilterType.cs" />
+    <Compile Include="Models\OperationType.cs" />
     <Compile Include="Models\ProcessSchemaStartSignalEvent.cs" />
     <Compile Include="MVVM\AsyncObvservableCollection.cs" />
     <Compile Include="MVVM\Behavior\BindableSelectedItemBehavior.cs" />

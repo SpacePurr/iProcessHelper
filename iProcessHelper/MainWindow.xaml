@@ -33,10 +33,15 @@
                 </Setter.Value>
             </Setter>
         </Style>
+
+        <DataTemplate DataType="{x:Type models:FilterField}">
+            <TextBox Text="{Binding Name}"/>
+        </DataTemplate>
         
         <DataTemplate DataType="{x:Type models:ProcessSchemaStartSignalEvent}">
             <Grid x:Name="StartSignalGrid">
                 <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
                     <RowDefinition Height="*"/>
                     <RowDefinition Height="*"/>
                     <RowDefinition Height="*"/>
@@ -61,6 +66,15 @@
                         </ComboBox.ItemTemplate>
                     </ComboBox>
                 </StackPanel>
+                <Grid Grid.Row="3" >
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <Button HorizontalAlignment="Left" Width="70" Height="30" Grid.Row="0" 
+                            Content="Добавить" Command="{Binding AddFilterField}"/>
+                    <ListView Grid.Row="1" ItemsSource="{Binding FilterFields}" Height="300"/>
+                </Grid>
                 
                 <Button x:Name="DeleteButton" HorizontalAlignment="Right" VerticalAlignment="Top" Style="{StaticResource TransparentStyle}"
                         Background="Transparent" Height="20" Width="20"

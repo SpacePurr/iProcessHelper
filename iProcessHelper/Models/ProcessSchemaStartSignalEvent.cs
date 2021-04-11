@@ -1,5 +1,6 @@
 ﻿using iProcessHelper.DBContexts.DBModels;
 using iProcessHelper.Helpers;
+using iProcessHelper.MVVM;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -17,10 +18,15 @@ namespace iProcessHelper.Models
 
         public List<EntitySignal> EntitySignals { get; set; } = Constants.entitySignals;
         public ObservableCollection<SysSchema> Entities { get; set; } = Constants.entities;
+        public ObservableCollection<FilterField> FilterFields { get; set; }
+
+        public Command AddFilterField { get; set; }
 
         public ProcessSchemaStartSignalEvent() : base()
         {
+            FilterFields = new ObservableCollection<FilterField>();
             Name = "Сигнал";
+            AddFilterField = new Command(AddFilterFieldMethod);
         }
 
         public override bool Filter(ProcessTreeViewElement element)
@@ -29,6 +35,11 @@ namespace iProcessHelper.Models
                 return element.Json.Metadata.Schema.FlowElements.FirstOrDefault(e => e.EntitySignal == EntitySignal.Value && e.EntitySchemanUId == Entity.UId) != null;
 
             return false;
+        }
+
+        public void AddFilterFieldMethod(object obj)
+        {
+            FilterFields.Add(new FilterField());
         }
     }
 }
