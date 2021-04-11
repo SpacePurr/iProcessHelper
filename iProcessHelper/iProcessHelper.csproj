@@ -83,10 +83,18 @@
     <Compile Include="JsonProcessModel\ProcessModel.cs" />
     <Compile Include="JsonProcessModel\ProcessModelMetadata.cs" />
     <Compile Include="JsonProcessModel\ProcessModelSchema.cs" />
+    <Compile Include="Models\EntitySignal.cs" />
+    <Compile Include="Models\FilterObject.cs" />
+    <Compile Include="Models\FilterType.cs" />
+    <Compile Include="Models\ProcessSchemaStartSignalEvent.cs" />
+    <Compile Include="MVVM\AsyncObvservableCollection.cs" />
     <Compile Include="MVVM\Behavior\BindableSelectedItemBehavior.cs" />
     <Compile Include="ViewModels\HierarchicalProcessViewModel.cs" />
     <Compile Include="Views\HierarchicalProcessWindow.xaml.cs">
       <DependentUpon>HierarchicalProcessWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\SelectWindow.xaml.cs">
+      <DependentUpon>SelectWindow.xaml</DependentUpon>
     </Compile>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -109,6 +117,10 @@
       <SubType>Code</SubType>
     </Compile>
     <Page Include="Views\HierarchicalProcessWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\SelectWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

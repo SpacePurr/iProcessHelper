@@ -9,23 +9,39 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace iProcessHelper.ViewModels
 {
     class HierarchicalProcessViewModel : NotifyPropertyChanged
     {
         public ObservableCollection<ProcessTreeViewElement> Processes { get; set; }
+        private event Action<ProcessTreeViewElement> OnCollectionChanged;
+
         public HierarchicalProcessViewModel(ProcessTreeViewElement element, ObservableCollection<ProcessTreeViewElement> processes)
         {
             Processes = new ObservableCollection<ProcessTreeViewElement>();
             var helper = new ProcessMetadataParser();
 
-            foreach (var item in processes)
-            {
-                item.Json = helper.Deserialize<ProcessModelShort>(item.SysSchema.MetaData);
-            }
+            OnCollectionChanged += HierarchicalProcessViewModel_OnCollectionChanged;
 
-            this.SetTree(element, processes);
+            Task.Factory.StartNew(() =>
+            {
+                foreach (var item in processes)
+                {
+                    item.Json = helper.Deserialize<ProcessModelShort>(item.SysSchema.MetaData);
+                }
+
+                this.SetTree(element, processes);
+            });
+        }
+
+        private void HierarchicalProcessViewModel_OnCollectionChanged(ProcessTreeViewElement obj)
+        {
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                Processes.Add(obj);
+            });
         }
 
         private void SetTree(ProcessTreeViewElement element, ObservableCollection<ProcessTreeViewElement> processes)
@@ -42,10 +58,9 @@ namespace iProcessHelper.ViewModels
                     var ct = new ProcessTreeViewElement();
                     ct.Items.Add(tree);
 
-                    Processes.Add(tree);
+                    OnCollectionChanged(tree);
                 }
             }
         }
-
     }
 }

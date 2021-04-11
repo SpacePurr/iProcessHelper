@@ -8,19 +8,77 @@
         xmlns:dbmodels="clr-namespace:iProcessHelper.DBContexts.DBModels"
         xmlns:models="clr-namespace:iProcessHelper.Models"
         xmlns:fa="http://schemas.fontawesome.io/icons/"
-        Title="MainWindow" Name="MyWindow" Height="450" Width="800" WindowState="Maximized">
+        Title="iProcessHelper" Name="MyWindow" Height="450" Width="800" WindowState="Maximized">
     <Window.DataContext>
         <local:MainViewModel/>
     </Window.DataContext>
-    
+
+    <Window.Resources>
+        <Style x:Key="TransparentStyle" TargetType="{x:Type Button}">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button" >
+                        <Border Background="{TemplateBinding Background}" Name="Border" >
+                            <ContentPresenter/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Border" Property="Background" Value="#FF8CB3EE"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="Border" Property="Background" Value="#FF285395"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        
+        <DataTemplate DataType="{x:Type models:ProcessSchemaStartSignalEvent}">
+            <Grid x:Name="StartSignalGrid">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <TextBlock Grid.Row="0" Text="{Binding Name}"/>
+                <StackPanel Grid.Row="1" Orientation="Horizontal">
+                    <TextBlock Width="150" Text="Тип операции"/>
+                    <ComboBox Width="200" ItemsSource="{Binding EntitySignals}"
+                          HorizontalAlignment="Left" Margin="10 0 0 0"
+                          SelectedValue="{Binding EntitySignal}"/>
+                </StackPanel>
+                <StackPanel Grid.Row="2" Orientation="Horizontal">
+                    <TextBlock Width="150" Text="Объект"/>
+                    <ComboBox Width="200" Grid.Row="2" ItemsSource="{Binding Entities}"
+                          HorizontalAlignment="Left" Margin="10 0 0 0"
+                          SelectedValue="{Binding Entity}"
+                          IsTextSearchEnabled="True" TextSearch.TextPath="Caption">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Caption}"/>
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+                </StackPanel>
+                
+                <Button x:Name="DeleteButton" HorizontalAlignment="Right" VerticalAlignment="Top" Style="{StaticResource TransparentStyle}"
+                        Background="Transparent" Height="20" Width="20"
+                        DataContext="{Binding ElementName=MyWindow, Path=DataContext}" Content="x" 
+                        Command="{Binding DeleteFilter}" CommandParameter="{Binding ElementName=StartSignalGrid, Path=DataContext}"/>
+            </Grid>
+        </DataTemplate>
+    </Window.Resources>
+
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="5*"/>
+            <RowDefinition Height="50"/>
+            <RowDefinition Height="9*"/>
+            <RowDefinition Height="30"/>
         </Grid.RowDefinitions>
 
         <Grid x:Name="SettingsPanel" Grid.Row="0">
-            <Button Content="Загрузить" Margin="20 20 0 0" HorizontalAlignment="Left" VerticalAlignment="Top" Width="75" Command="{Binding Load}"/>
+            <Button Content="Загрузить" Margin="10 10 0 0" HorizontalAlignment="Left" VerticalAlignment="Top" Width="75" Command="{Binding Load}"/>
         </Grid>
 
         <Grid x:Name="ViewPanel" Grid.Row="1">
@@ -29,7 +87,7 @@
                 <ColumnDefinition Width="3*"/>
             </Grid.ColumnDefinitions>
             <Grid x:Name="Tree" Grid.Column="0">
-                <TreeView x:Name="ProcessesTreeView" ItemsSource="{Binding Processes}">
+                <TreeView x:Name="ProcessesTreeView" ItemsSource="{Binding Processes}" Opacity="10">
                     <TreeView.ItemTemplate>
                         <HierarchicalDataTemplate
                             ItemsSource="{Binding Path=Items}" 
@@ -65,24 +123,45 @@
 
             <Grid x:Name="Filter" Grid.Column="1">
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="60"/>
+                    <RowDefinition Height="50"/>
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
                 <Grid x:Name="SearchText" Grid.Row="0">
-                    <TextBox Text="{Binding SearchedProcessName, UpdateSourceTrigger=PropertyChanged}" Height="30" Margin="20 0 20 0"/>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="130"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Border>
+                        <TextBlock Margin="10 0 0 0" Text="Поиск по названию" Grid.Column="0" VerticalAlignment="Center"/>
+                    </Border>
+                    <TextBox Text="{Binding SearchedProcessName}" Margin="15" 
+                             Grid.Column="1" TextAlignment="Left" HorizontalContentAlignment="Left" VerticalContentAlignment="Center"/>
                 </Grid>
 
                 <Grid x:Name="VisualFilter" Grid.Row="1">
-                    <Canvas>
-                        <ItemsControl/>
-                    </Canvas>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="50"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <Button Grid.Row="0" Width="80" Height="30" HorizontalAlignment="Left" Margin="10 0 0 0" Content="Добавить" Command="{Binding AddFilter}"/>
+                    <Button Grid.Row="0" Width="80" Height="30" HorizontalAlignment="Left" Margin="110 0 0 0" Content="Применить" Command="{Binding Apply}"/>
+                    <ListView Grid.Row="1" ItemsSource="{Binding FilterObjects}">
+                        <ListView.ItemContainerStyle>
+                            <Style TargetType="ListViewItem">
+                                <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                            </Style>
+                        </ListView.ItemContainerStyle>
+                    </ListView>
                 </Grid>
             </Grid>
         </Grid>
-        
-        <!--<Grid Grid.RowSpan="2" Visibility="{Binding SpinnerVisible}" Background="Gray">
-            
-            <fa:ImageAwesome Icon="Spinner" Spin="True" Height="50" Width="50" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-        </Grid>-->
+        <Grid Grid.Row="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="{Binding ElementName=Tree, Path=ActualWidth}"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <ProgressBar Margin="10" x:Name="ProgressBar" Minimum="0" Maximum="100" Value="{Binding CurrentProgress, Mode=OneWay}" Grid.Column="0"/>
+        </Grid>
     </Grid>
 </Window>

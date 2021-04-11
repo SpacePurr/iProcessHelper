@@ -5,9 +5,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:iProcessHelper.Views"
         mc:Ignorable="d"
-        xmlns:vm ="clr-namespace:iProcessHelper.ViewModels"
         xmlns:models="clr-namespace:iProcessHelper.Models"
-        Title="HierarchicalProcessWindow" Height="450" Width="800">
+        Title="Иерархия процессов" Height="450" Width="800">
     <Grid>
         <TreeView x:Name="ProcessesTreeView" ItemsSource="{Binding Processes}">
             <TreeView.ItemTemplate>

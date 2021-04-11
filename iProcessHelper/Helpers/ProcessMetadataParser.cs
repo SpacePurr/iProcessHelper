@@ -1,6 +1,7 @@
 ﻿using iProcessHelper.DBContexts.DBModels;
 using iProcessHelper.JsonProcessModels.Short;
 using iProcessHelper.Models;
+using iProcessHelper.MVVM;
 using iProcessHelper.ProcessJsonModel;
 using Newtonsoft.Json;
 using System;

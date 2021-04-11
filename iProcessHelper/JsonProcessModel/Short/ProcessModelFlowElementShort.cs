@@ -15,5 +15,9 @@ namespace iProcessHelper.JsonProcessModels.Short
         public string Name { get; set; }
         [JsonProperty("CK4")]
         public Guid SchemaUId { get; set; }
+        [JsonProperty("FC2")]
+        public Guid EntitySchemanUId { get; set; }
+        [JsonProperty("DZ5")]
+        public int EntitySignal { get; set; }
     }
 }
