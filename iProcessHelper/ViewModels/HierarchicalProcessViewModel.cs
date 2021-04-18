@@ -1,6 +1,6 @@
 ﻿using iProcessHelper.DBContexts.DBModels;
 using iProcessHelper.Helpers;
-using iProcessHelper.JsonProcessModels.Short;
+using iProcessHelper.JsonModels.JsonProcessModels;
 using iProcessHelper.Models;
 using iProcessHelper.MVVM;
 using System;
@@ -21,7 +21,7 @@ namespace iProcessHelper.ViewModels
         public HierarchicalProcessViewModel(ProcessTreeViewElement element, ObservableCollection<ProcessTreeViewElement> processes)
         {
             Processes = new ObservableCollection<ProcessTreeViewElement>();
-            var helper = new ProcessMetadataParser();
+            var helper = new MetadataParser();
 
             OnCollectionChanged += HierarchicalProcessViewModel_OnCollectionChanged;
 
@@ -29,7 +29,7 @@ namespace iProcessHelper.ViewModels
             {
                 foreach (var item in processes)
                 {
-                    item.Json = helper.Deserialize<ProcessModelShort>(item.SysSchema.MetaData);
+                    item.Json = helper.Deserialize<ProcessModel>(item.SysSchema.MetaData);
                 }
 
                 this.SetTree(element, processes);
@@ -46,7 +46,7 @@ namespace iProcessHelper.ViewModels
 
         private void SetTree(ProcessTreeViewElement element, ObservableCollection<ProcessTreeViewElement> processes)
         {
-            var helper = new ProcessMetadataParser();
+            var helper = new MetadataParser();
             if (element.SysSchema != null)
             {
                 var parents = helper.GetMainParents(processes, element);

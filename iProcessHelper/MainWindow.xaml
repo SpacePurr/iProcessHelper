@@ -14,6 +14,36 @@
     </Window.DataContext>
 
     <Window.Resources>
+        <Style x:Key="FieldTextBlock" TargetType="{x:Type TextBlock}">
+            <Setter Property="Margin" Value="10 2 2 2"/>
+            <Setter Property="Width" Value="150"/>
+            <Setter Property="HorizontalAlignment" Value="Left"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+        </Style>
+
+        <Style x:Key="FieldComboBox" TargetType="{x:Type ComboBox}">
+            <Setter Property="Margin" Value="10 2 2 2"/>
+            <Setter Property="Width" Value="200"/>
+            <Setter Property="HorizontalAlignment" Value="Left"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+        </Style>
+
+        <Style x:Key="FieldTextBox" TargetType="{x:Type TextBox}">
+            <Setter Property="Margin" Value="10 2 2 2"/>
+            <Setter Property="Width" Value="200"/>
+            <Setter Property="HorizontalAlignment" Value="Left"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="TextAlignment" Value="Left"/>
+        </Style>
+
+        <Style x:Key="ButtonStyle" TargetType="{x:Type Button}">
+            <Setter Property="Width" Value="80"/>
+            <Setter Property="Height" Value="30"/>
+            <Setter Property="Margin" Value="10 5 5 5"/>
+            <Setter Property="HorizontalAlignment" Value="Left"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+        </Style>
+
         <Style x:Key="TransparentStyle" TargetType="{x:Type Button}">
             <Setter Property="Template">
                 <Setter.Value>
@@ -35,47 +65,93 @@
         </Style>
 
         <DataTemplate DataType="{x:Type models:FilterField}">
-            <TextBox Text="{Binding Name}"/>
-        </DataTemplate>
-        
-        <DataTemplate DataType="{x:Type models:ProcessSchemaStartSignalEvent}">
-            <Grid x:Name="StartSignalGrid">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="*"/>
-                </Grid.RowDefinitions>
-                <TextBlock Grid.Row="0" Text="{Binding Name}"/>
-                <StackPanel Grid.Row="1" Orientation="Horizontal">
-                    <TextBlock Width="150" Text="Тип операции"/>
-                    <ComboBox Width="200" ItemsSource="{Binding EntitySignals}"
+            <StackPanel Orientation="Vertical">
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="Поле" Style="{StaticResource FieldTextBlock}"/>
+                    <ComboBox Width="200" ItemsSource="{Binding Columns}"
                           HorizontalAlignment="Left" Margin="10 0 0 0"
-                          SelectedValue="{Binding EntitySignal}"/>
-                </StackPanel>
-                <StackPanel Grid.Row="2" Orientation="Horizontal">
-                    <TextBlock Width="150" Text="Объект"/>
-                    <ComboBox Width="200" Grid.Row="2" ItemsSource="{Binding Entities}"
-                          HorizontalAlignment="Left" Margin="10 0 0 0"
-                          SelectedValue="{Binding Entity}"
-                          IsTextSearchEnabled="True" TextSearch.TextPath="Caption">
+                          SelectedValue="{Binding Column}">
                         <ComboBox.ItemTemplate>
                             <DataTemplate>
-                                <TextBlock Text="{Binding Caption}"/>
+                                <TextBlock Text="{Binding Name}"/>
                             </DataTemplate>
                         </ComboBox.ItemTemplate>
                     </ComboBox>
                 </StackPanel>
-                <Grid Grid.Row="3" >
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="*"/>
-                        <RowDefinition Height="*"/>
-                    </Grid.RowDefinitions>
-                    <Button HorizontalAlignment="Left" Width="70" Height="30" Grid.Row="0" 
-                            Content="Добавить" Command="{Binding AddFilterField}"/>
-                    <ListView Grid.Row="1" ItemsSource="{Binding FilterFields}" Height="300"/>
-                </Grid>
+
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="Тип операции" Style="{StaticResource FieldTextBlock}"/>
+                    <ComboBox Width="200" ItemsSource="{Binding OperationTypes}"
+                          HorizontalAlignment="Left" Margin="10 0 0 0"
+                          SelectedValue="{Binding OperationType}">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Name}"/>
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+                </StackPanel>
                 
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="Значение" Style="{StaticResource FieldTextBlock}"/>
+                    <TextBox Style="{StaticResource FieldTextBox}" Visibility="{Binding TextVisibility}" Text="{Binding TextValue}" Width="250"/>
+                    <TextBox Style="{StaticResource FieldTextBox}" Visibility="{Binding IntVisibility}" Text="{Binding IntValue}" Width="250"/>
+                    <TextBox Style="{StaticResource FieldTextBox}" Visibility="{Binding DecimalVisibility}" Text="{Binding DecimalValue}" Width="250"/>
+                    <TextBox Style="{StaticResource FieldTextBox}" Visibility="{Binding BoolVisibility}" Text="{Binding BoolValue}" Width="250"/>
+                    <TextBox Style="{StaticResource FieldTextBox}" Visibility="{Binding ObjectVisibility}" Text="{Binding ObjectValue}" Width="250"/>
+                </StackPanel>
+            </StackPanel>
+            
+        </DataTemplate>
+
+        <DataTemplate DataType="{x:Type models:TriggerField}">
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="Поле" Style="{StaticResource FieldTextBlock}"/>
+                <ComboBox Width="200" ItemsSource="{Binding Columns}"
+                          HorizontalAlignment="Left" Margin="10 0 0 0"
+                          SelectedValue="{Binding Column}">
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Name}"/>
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                </ComboBox>
+            </StackPanel>
+            
+        </DataTemplate>
+
+        <DataTemplate DataType="{x:Type models:ProcessSchemaStartSignalEvent}">
+            <Grid x:Name="StartSignalGrid">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="40"/>
+                    <RowDefinition Height="40"/>
+                    <RowDefinition Height="40"/>
+                    <RowDefinition Height="40"/>
+                    <RowDefinition Height="1*"/>
+                    <RowDefinition Height="1*"/>
+                </Grid.RowDefinitions>
+                <TextBlock Grid.Row="0" Text="{Binding Name}" Style="{StaticResource FieldTextBlock}"/>
+                <StackPanel Grid.Row="1" Orientation="Horizontal">
+                    <TextBlock Text="Тип операции" Style="{StaticResource FieldTextBlock}"/>
+                    <ComboBox ItemsSource="{Binding EntitySignals}"
+                              SelectedValue="{Binding EntitySignal}"
+                              Style="{StaticResource FieldComboBox}"/>
+                </StackPanel>
+                <StackPanel Grid.Row="2" Orientation="Horizontal">
+                    <TextBlock Text="Объект" Style="{StaticResource FieldTextBlock}"/>
+                    <ComboBox Grid.Row="2" ItemsSource="{Binding Entities}"
+                              SelectedValue="{Binding Entity}"
+                              IsTextSearchEnabled="True" TextSearch.TextPath="Caption"
+                              Style="{StaticResource FieldComboBox}"/>
+                </StackPanel>
+                <StackPanel Grid.Row="3" Orientation="Horizontal">
+                    <Button Content="Триггер" Command="{Binding AddTriggerField}" Style="{StaticResource ButtonStyle}"/>
+                    <Button Content="Фильтр" Command="{Binding AddFilterField}" Style="{StaticResource ButtonStyle}"/>
+                </StackPanel>
+
+                <ListView Grid.Row="4" ItemsSource="{Binding TriggerFields}" Height="150" Margin="5"/>
+                <ListView Grid.Row="5" ItemsSource="{Binding FilterFields}" Height="150" Margin="5"/>
+
                 <Button x:Name="DeleteButton" HorizontalAlignment="Right" VerticalAlignment="Top" Style="{StaticResource TransparentStyle}"
                         Background="Transparent" Height="20" Width="20"
                         DataContext="{Binding ElementName=MyWindow, Path=DataContext}" Content="x" 
@@ -92,7 +168,7 @@
         </Grid.RowDefinitions>
 
         <Grid x:Name="SettingsPanel" Grid.Row="0">
-            <Button Content="Загрузить" Margin="10 10 0 0" HorizontalAlignment="Left" VerticalAlignment="Top" Width="75" Command="{Binding Load}"/>
+            <Button Content="Загрузить" Command="{Binding Load}" Style="{StaticResource ButtonStyle}"/>
         </Grid>
 
         <Grid x:Name="ViewPanel" Grid.Row="1">
@@ -137,28 +213,23 @@
 
             <Grid x:Name="Filter" Grid.Column="1">
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="50"/>
+                    <RowDefinition Height="40"/>
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
-                <Grid x:Name="SearchText" Grid.Row="0">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="130"/>
-                        <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
-                    <Border>
-                        <TextBlock Margin="10 0 0 0" Text="Поиск по названию" Grid.Column="0" VerticalAlignment="Center"/>
-                    </Border>
-                    <TextBox Text="{Binding SearchedProcessName}" Margin="15" 
-                             Grid.Column="1" TextAlignment="Left" HorizontalContentAlignment="Left" VerticalContentAlignment="Center"/>
-                </Grid>
+                <StackPanel Grid.Row="0" Orientation="Horizontal">
+                    <TextBlock Text="Поиск по названию" Style="{StaticResource FieldTextBlock}"/>
+                    <TextBox Text="{Binding SearchedProcessName, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FieldTextBox}" Width="250"/>
+                </StackPanel>
 
                 <Grid x:Name="VisualFilter" Grid.Row="1">
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="50"/>
+                        <RowDefinition Height="40"/>
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
-                    <Button Grid.Row="0" Width="80" Height="30" HorizontalAlignment="Left" Margin="10 0 0 0" Content="Добавить" Command="{Binding AddFilter}"/>
-                    <Button Grid.Row="0" Width="80" Height="30" HorizontalAlignment="Left" Margin="110 0 0 0" Content="Применить" Command="{Binding Apply}"/>
+                    <StackPanel Orientation="Horizontal">
+                        <Button Content="Добавить" Command="{Binding AddFilter}" Style="{StaticResource ButtonStyle}"/>
+                        <Button Content="Применить" Command="{Binding Apply}" Style="{StaticResource ButtonStyle}"/>
+                    </StackPanel>
                     <ListView Grid.Row="1" ItemsSource="{Binding FilterObjects}">
                         <ListView.ItemContainerStyle>
                             <Style TargetType="ListViewItem">

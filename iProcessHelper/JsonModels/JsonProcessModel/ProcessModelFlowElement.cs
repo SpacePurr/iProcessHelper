@@ -3,9 +3,9 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace iProcessHelper.JsonProcessModels.Short
+namespace iProcessHelper.JsonModels.JsonProcessModels
 {
-    public class ProcessModelFlowElementShort
+    public class ProcessModelFlowElement
     {
         [JsonProperty("BL1")]
         public string TypeName { get; set; }
@@ -19,5 +19,9 @@ namespace iProcessHelper.JsonProcessModels.Short
         public Guid EntitySchemanUId { get; set; }
         [JsonProperty("DZ5")]
         public int EntitySignal { get; set; }
+        [JsonProperty("DZ12")]
+        public string NewEntityChangedColumns { get; set; }
+        [JsonProperty("DZ13")]
+        public string EntityFilters { get; set; }
     }
 }

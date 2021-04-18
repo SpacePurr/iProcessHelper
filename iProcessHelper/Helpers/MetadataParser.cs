@@ -1,8 +1,6 @@
 ﻿using iProcessHelper.DBContexts.DBModels;
-using iProcessHelper.JsonProcessModels.Short;
 using iProcessHelper.Models;
 using iProcessHelper.MVVM;
-using iProcessHelper.ProcessJsonModel;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -14,13 +12,18 @@ using System.Threading.Tasks;
 
 namespace iProcessHelper.Helpers
 {
-    class ProcessMetadataParser
+    class MetadataParser
     {
         public T Deserialize<T>(byte[] data) where T : class
         {
             using (var stream = new MemoryStream(data))
             using (var reader = new StreamReader(stream, Encoding.UTF8))
                 return JsonSerializer.Create().Deserialize(reader, typeof(T)) as T;
+        }
+
+        public T Deserialize<T>(string data) where T : class
+        {
+                return JsonConvert.DeserializeObject<T>(data);
         }
 
         public ObservableCollection<ProcessTreeViewElement> GetMainParents(ObservableCollection<ProcessTreeViewElement> processes, ProcessTreeViewElement process)

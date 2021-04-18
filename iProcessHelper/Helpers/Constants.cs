@@ -22,6 +22,12 @@ namespace iProcessHelper.Helpers
             new EntitySignal("Удаление записи", 4)
         };
 
+        public static ObservableCollection<OperationType> operationTypes = new ObservableCollection<OperationType>
+        {
+            new OperationType("Не равно", 4),
+            new OperationType("Равно", 3),
+        };
+
         public static ObservableCollection<FilterType> filterTypes = new ObservableCollection<FilterType>
         {
             new FilterType()

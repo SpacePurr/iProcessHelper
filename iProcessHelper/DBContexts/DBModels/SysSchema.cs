@@ -1,6 +1,4 @@
-﻿using iProcessHelper.JsonProcessModels.Short;
-using iProcessHelper.ProcessJsonModel;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
@@ -20,5 +18,10 @@ namespace iProcessHelper.DBContexts.DBModels
         public string Caption { get; set; }
         public byte[] MetaData { get; set; }
         public Guid? ParentId { get; set; }
+
+        public override string ToString()
+        {
+            return Caption;
+        }
     }
 }

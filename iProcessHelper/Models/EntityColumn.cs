@@ -6,15 +6,11 @@ using System.Threading.Tasks;
 
 namespace iProcessHelper.Models
 {
-    public class OperationType
+    public class EntityColumn
     {
+        public Guid UId { get; set; }
         public string Name { get; set; }
-        public int Value { get; set; }
-
-        public OperationType(string name, int value)
-        {
-            Name = name;
-            Value = value;
-        }
+        public string Caption { get; set; }
+        public DataType DataType { get; set; }
     }
 }

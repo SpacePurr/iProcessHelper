@@ -1,9 +1,10 @@
-﻿using Newtonsoft.Json;
+﻿using iProcessHelper.JsonModels.JsonProcessModels;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace iProcessHelper.ProcessJsonModel
+namespace iProcessHelper.JsonModels.JsonProcessModel
 {
     public class ProcessModelMetadata
     {

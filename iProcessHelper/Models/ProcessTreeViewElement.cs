@@ -1,5 +1,5 @@
 ﻿using iProcessHelper.DBContexts.DBModels;
-using iProcessHelper.JsonProcessModels.Short;
+using iProcessHelper.JsonModels.JsonProcessModels;
 using iProcessHelper.MVVM;
 using System;
 using System.Collections.Generic;
@@ -19,7 +19,7 @@ namespace iProcessHelper.Models
         public bool IsVisible { get => isVisible; set { isVisible = value; OnPropertyChanged(); } }
 
         public ObservableCollection<ProcessTreeViewElement> Items { get; set; }
-        public ProcessModelShort Json { get; set; }
+        public ProcessModel Json { get; set; }
 
 
         public ProcessTreeViewElement()
