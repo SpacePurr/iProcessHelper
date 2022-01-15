@@ -139,7 +139,7 @@ namespace iProcessHelper
                             var parent = Processes.FirstOrDefault(e1 => e1.SysSchema.Id == sysSchema.ParentId);
                             if (parent != null)
                             {
-                                var json = new MetadataParser().Deserialize<ProcessModel>(sysSchema.MetaData);
+                                var json = MetadataParser.Deserialize<ProcessModel>(sysSchema.MetaData);
                                 OnChildCollectionUpdate(parent, new ProcessTreeViewElement
                                 {
                                     SysSchema = sysSchema,
@@ -149,7 +149,7 @@ namespace iProcessHelper
                         }
                         else
                         {
-                            var json = new MetadataParser().Deserialize<ProcessModel>(sysSchema.MetaData);
+                            var json = MetadataParser.Deserialize<ProcessModel>(sysSchema.MetaData);
                             OnCollectionUpdate(new ProcessTreeViewElement
                             {
                                 SysSchema = sysSchema,

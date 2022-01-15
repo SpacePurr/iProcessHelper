@@ -88,6 +88,7 @@
     <Compile Include="DBContexts\DBConnection.cs" />
     <Compile Include="Helpers\CommonHelper.cs" />
     <Compile Include="Helpers\Constants.cs" />
+    <Compile Include="Helpers\HierarchicalProcessTreeCreator.cs" />
     <Compile Include="Helpers\MetadataParser.cs" />
     <Compile Include="JsonModels\JsonProcessModel\EntityFilter.cs" />
     <Compile Include="Models\ColumnType.cs" />

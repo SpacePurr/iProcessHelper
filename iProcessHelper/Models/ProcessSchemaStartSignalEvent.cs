@@ -136,7 +136,7 @@ namespace iProcessHelper.Models
                 foreach (var signal in signals)
                 {
                     var entityFilters = signal.EntityFilters;
-                    var json = new MetadataParser().Deserialize<EntityFilter>(entityFilters);
+                    var json = MetadataParser.Deserialize<EntityFilter>(entityFilters);
 
                     var j1 = JObject.Parse(json.DataSourceFilters);
 

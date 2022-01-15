@@ -14,65 +14,20 @@ namespace iProcessHelper.Helpers
 {
     class MetadataParser
     {
-        public T Deserialize<T>(byte[] data) where T : class
+        public static T Deserialize<T>(byte[] data) where T : class
         {
             using (var stream = new MemoryStream(data))
-            using (var reader = new StreamReader(stream, Encoding.UTF8))
-                return JsonSerializer.Create().Deserialize(reader, typeof(T)) as T;
-        }
-
-        public T Deserialize<T>(string data) where T : class
-        {
-                return JsonConvert.DeserializeObject<T>(data);
-        }
-
-        public ObservableCollection<ProcessTreeViewElement> GetMainParents(ObservableCollection<ProcessTreeViewElement> processes, ProcessTreeViewElement process)
-        {
-            return this.GetNextParent(processes, process);
-        }
-
-        public ObservableCollection<ProcessTreeViewElement> GetNextParent(ObservableCollection<ProcessTreeViewElement> processes, ProcessTreeViewElement process)
-        {
-            var list = new ObservableCollection<ProcessTreeViewElement>();
-
-            var flowElements = processes.Where(p => p.Json.Metadata.Schema.FlowElements.Select(fe => fe.SchemaUId).Contains(process.SysSchema.UId));
-
-            if (flowElements.Any())
-                foreach (var fe in flowElements)
-                    foreach (var item in this.GetNextParent(processes, fe))
-                        list.Add(item);
-            else
-                list.Add(process);
-
-            return list;
-        }
-
-        public ProcessTreeViewElement GetChildrenTree(ObservableCollection<ProcessTreeViewElement> processes, ProcessTreeViewElement process)
-        {
-            return new ProcessTreeViewElement
             {
-                SysSchema = process.SysSchema,
-                Items = this.GetChildren(processes, process)
-            };
-        }
-
-        public ObservableCollection<ProcessTreeViewElement> GetChildren(ObservableCollection<ProcessTreeViewElement> processes, ProcessTreeViewElement process)
-        {
-            var list = new ObservableCollection<ProcessTreeViewElement>();
-
-            var flowElements = process.Json.Metadata.Schema.FlowElements.Where(fe => fe.TypeName.Contains("ProcessSchemaSubProcess"));
-            foreach (var fe in flowElements)
-            {
-                var findedProc = processes.FirstOrDefault(p => p.SysSchema.UId == fe.SchemaUId);
-                if (findedProc != null)
-                    list.Add(new ProcessTreeViewElement
-                    {
-                        SysSchema = findedProc.SysSchema,
-                        Items = this.GetChildren(processes, findedProc)
-                    });
+                using (var reader = new StreamReader(stream, Encoding.UTF8))
+                {
+                    return JsonSerializer.Create().Deserialize(reader, typeof(T)) as T;
+                }
             }
+        }
 
-            return list;
+        public static T Deserialize<T>(string data) where T : class
+        {
+            return JsonConvert.DeserializeObject<T>(data);
         }
     }
 }

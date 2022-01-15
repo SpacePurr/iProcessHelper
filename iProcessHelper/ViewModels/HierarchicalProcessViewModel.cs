@@ -21,7 +21,6 @@ namespace iProcessHelper.ViewModels
         public HierarchicalProcessViewModel(ProcessTreeViewElement element, ObservableCollection<ProcessTreeViewElement> processes)
         {
             Processes = new ObservableCollection<ProcessTreeViewElement>();
-            var helper = new MetadataParser();
 
             OnCollectionChanged += HierarchicalProcessViewModel_OnCollectionChanged;
 
@@ -29,7 +28,7 @@ namespace iProcessHelper.ViewModels
             {
                 foreach (var item in processes)
                 {
-                    item.Json = helper.Deserialize<ProcessModel>(item.SysSchema.MetaData);
+                    item.Json = MetadataParser.Deserialize<ProcessModel>(item.SysSchema.MetaData);
                 }
 
                 this.SetTree(element, processes);
@@ -46,7 +45,7 @@ namespace iProcessHelper.ViewModels
 
         private void SetTree(ProcessTreeViewElement element, ObservableCollection<ProcessTreeViewElement> processes)
         {
-            var helper = new MetadataParser();
+            var helper = new HierarchicalProcessTreeCreator();
             if (element.SysSchema != null)
             {
                 var parents = helper.GetMainParents(processes, element);
