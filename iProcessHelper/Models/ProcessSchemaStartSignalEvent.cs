@@ -53,10 +53,10 @@ namespace iProcessHelper.Models
             } 
         }
 
-        public ObservableCollection<SysSchema> Entities { get; set; } = Constants.entities;
+        public ObservableCollection<SysSchema> Entities { get; set; } = Constants.Entities;
 
         public EntitySignal EntitySignal { get; set; }
-        public List<EntitySignal> EntitySignals { get; set; } = Constants.entitySignals;
+        public List<EntitySignal> EntitySignals { get; set; } = Constants.EntitySignals;
 
         public ObservableCollection<FilterField> FilterFields { get; set; }
         public ObservableCollection<TriggerField> TriggerFields { get; set; }

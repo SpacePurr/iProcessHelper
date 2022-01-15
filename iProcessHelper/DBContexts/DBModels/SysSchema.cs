@@ -17,7 +17,7 @@ namespace iProcessHelper.DBContexts.DBModels
         public string Name { get; set; }
         public string Caption { get; set; }
         public byte[] MetaData { get; set; }
-        public Guid? ParentId { get; set; }
+        public Guid ParentId { get; set; }
 
         public override string ToString()
         {

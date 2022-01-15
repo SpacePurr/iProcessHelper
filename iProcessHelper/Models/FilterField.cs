@@ -62,7 +62,7 @@ namespace iProcessHelper.Models
 
         public string Name { get; set; }
         public OperationType OperationType { get; set; }
-        public ObservableCollection<OperationType> OperationTypes { get; set; } = Constants.operationTypes;
+        public ObservableCollection<OperationType> OperationTypes { get; set; } = Constants.OperationTypes;
 
         public string TextValue { get; set; }
         public int IntValue { get; set; }

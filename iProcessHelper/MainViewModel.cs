@@ -1,5 +1,6 @@
 ﻿using iProcessHelper.DBContexts;
 using iProcessHelper.DBContexts.DBModels;
+using iProcessHelper.DBContexts.Repository;
 using iProcessHelper.Helpers;
 using iProcessHelper.JsonModels.JsonProcessModels;
 using iProcessHelper.Models;
@@ -23,35 +24,44 @@ namespace iProcessHelper
 {
     class MainViewModel : NotifyPropertyChanged
     {
-        private string searchedProcessName;
-        private int blurRadius;
-        private bool isTreeLoading;
-        private double currentProgress;
+        private readonly BackgroundWorker _worker;
 
+
+        private string searchedProcessName;
         public string SearchedProcessName { get => searchedProcessName; set { searchedProcessName = value; OnPropertyChanged(); this.ApplyMethod(null); } }
 
+        private int blurRadius;
         public int BlurRadius { get => blurRadius; set { blurRadius = value; OnPropertyChanged(); } }
+
+        private bool isTreeLoading;
         public bool IsTreeLoading { get => isTreeLoading; set { isTreeLoading = value; CommandManager.InvalidateRequerySuggested(); } }
+
+        private double currentProgress;
+        public double CurrentProgress { get => currentProgress; set { currentProgress = value; OnPropertyChanged(); } }
+
+        #region Commands
 
         public Command Load { get; set; }
         public Command AddFilter { get; set; }
         public Command Apply { get; set; }
         public Command DeleteFilter { get; set; }
+
+        #endregion
+
         public ObservableCollection<ProcessTreeViewElement> Processes { get; set; } = new ObservableCollection<ProcessTreeViewElement>();
         public ObservableCollection<SysSchema> Local { get; set; }
-
         public ObservableCollection<FilterObject> FilterObjects { get; set; }
+        public ObservableCollection<FilterType> FilterTypes { get; set; }
+
+        #region Events
 
         private event Action<ProcessTreeViewElement> OnCollectionUpdate;
         private event Action<ProcessTreeViewElement, ProcessTreeViewElement> OnChildCollectionUpdate;
         private event Action OnProcessClear;
-
         private event Action<SysSchema> OnEntitiesCollectionUpdate;
 
-        private readonly BackgroundWorker _worker;
-        public double CurrentProgress { get => currentProgress; set { currentProgress = value; OnPropertyChanged(); } }
+        #endregion
 
-        public ObservableCollection<FilterType> FilterTypes { get; set; }
 
         public MainViewModel()
         {
@@ -75,14 +85,14 @@ namespace iProcessHelper
             _worker.RunWorkerCompleted += RunWorkerCompleted;
 
             FilterObjects = new ObservableCollection<FilterObject>();
-            FilterTypes = Constants.filterTypes;
+            FilterTypes = Constants.FilterTypes;
         }
 
         private void MainViewModel_OnEntitiesCollectionUpdate(SysSchema obj)
         {
             Application.Current.Dispatcher.Invoke(() =>
             {
-                Constants.entities.Add(obj);
+                Constants.Entities.Add(obj);
             });
         }
 
@@ -90,6 +100,7 @@ namespace iProcessHelper
         {
             IsTreeLoading = false;
         }
+
         private void DoWork(object sender, DoWorkEventArgs e)
         {
             this.OnProcessClear();
@@ -97,91 +108,59 @@ namespace iProcessHelper
             {
                 connection.Open();
 
-                var count = 0;
+                string sqlExpression;
+                int count;
 
-                string sqlExpression = "select COUNT(id) as SysSchemaCount from SysSchema where ManagerName='ProcessSchemaManager'";
-                SqlCommand command = new SqlCommand(sqlExpression, connection);
-                using (SqlDataReader reader = command.ExecuteReader())
+                sqlExpression = "select COUNT(Id) as RowsCount from SysSchema where ManagerName='ProcessSchemaManager' and ParentId is null";
+                count = BackgroundLoadFromDBService.GetCount(connection, sqlExpression);
+
+                sqlExpression = "select * from SysSchema where ManagerName='ProcessSchemaManager' and ParentId is null order by Caption";
+                BackgroundLoadFromDBService.Load(connection, _worker, count, sqlExpression, (reader) =>
                 {
-                    if (reader.Read())
+                    var sysSchema = SysSchemaRepository.CreateProcessSchema(reader);
+
+                    var json = MetadataParser.Deserialize<ProcessModel>(sysSchema.MetaData);
+                    OnCollectionUpdate(new ProcessTreeViewElement
                     {
-                        count = int.Parse(reader["SysSchemaCount"].ToString());
-                    }
-                }
+                        SysSchema = sysSchema,
+                        Json = json
+                    });
+                });
 
-                sqlExpression = "select * from SysSchema where ManagerName='ProcessSchemaManager' order by Caption";
-                command = new SqlCommand(sqlExpression, connection);
+                sqlExpression = "select COUNT(Id) as RowsCount from SysSchema where ManagerName='ProcessSchemaManager' and ParentId is not null";
+                count = BackgroundLoadFromDBService.GetCount(connection, sqlExpression);
 
-                using (SqlDataReader reader = command.ExecuteReader())
+                sqlExpression = "select * from SysSchema where ManagerName='ProcessSchemaManager' and ParentId is not null order by Caption";
+                BackgroundLoadFromDBService.Load(connection, _worker, count, sqlExpression, (reader) =>
                 {
-                    double percent = 0;
-                    while (reader.Read())
+                    var sysSchema = SysSchemaRepository.CreateProcessSchema(reader);
+
+                    var parent = Processes.FirstOrDefault(e1 => e1.SysSchema.Id == sysSchema.ParentId);
+
+                    if (parent != null)
                     {
-                        double step = 100.0 / count;
-                        percent += step;
-                        _worker.ReportProgress((int)percent);
-
-                        var sysSchema = new SysSchema
+                        var json = MetadataParser.Deserialize<ProcessModel>(sysSchema.MetaData);
+                        OnChildCollectionUpdate(parent, new ProcessTreeViewElement
                         {
-                            Id = Guid.Parse(reader["id"].ToString()),
-                            CreatedOn = DateTime.Parse(reader["CreatedOn"].ToString()),
-                            ManagerName = reader["ManagerName"].ToString(),
-                            UId = Guid.Parse(reader["UId"].ToString()),
-                            Name = reader["Name"].ToString(),
-                            Caption = reader["Caption"].ToString(),
-                            MetaData = (byte[])reader["MetaData"]
-                        };
-                        if (!string.IsNullOrEmpty(reader["ParentId"].ToString()))
-                            sysSchema.ParentId = Guid.Parse(reader["ParentId"].ToString());
-
-                        if (sysSchema.ParentId != null && sysSchema.ParentId != Guid.Empty)
-                        {
-                            var parent = Processes.FirstOrDefault(e1 => e1.SysSchema.Id == sysSchema.ParentId);
-                            if (parent != null)
-                            {
-                                var json = MetadataParser.Deserialize<ProcessModel>(sysSchema.MetaData);
-                                OnChildCollectionUpdate(parent, new ProcessTreeViewElement
-                                {
-                                    SysSchema = sysSchema,
-                                    Json = json
-                                });
-                            }
-                        }
-                        else
-                        {
-                            var json = MetadataParser.Deserialize<ProcessModel>(sysSchema.MetaData);
-                            OnCollectionUpdate(new ProcessTreeViewElement
-                            {
-                                SysSchema = sysSchema,
-                                Json = json
-                            });
-                        }
+                            SysSchema = sysSchema,
+                            Json = json
+                        });
                     }
-                }
+                });
+
+                sqlExpression = "select COUNT(Id) as RowsCount from VwSysSchemaInfo where ManagerName='EntitySchemaManager'";
+                count = BackgroundLoadFromDBService.GetCount(connection, sqlExpression);
 
                 sqlExpression = "SELECT * FROM VwSysSchemaInfo where ManagerName='EntitySchemaManager' ORDER BY Caption";
-                command = new SqlCommand(sqlExpression, connection);
-
-                using (SqlDataReader reader = command.ExecuteReader())
+                BackgroundLoadFromDBService.Load(connection, _worker, count, sqlExpression, (reader) =>
                 {
-                    while (reader.Read())
-                    {
-                        var sysSchema = new SysSchema
-                        {
-                            Id = Guid.Parse(reader["id"].ToString()),
-                            CreatedOn = DateTime.Parse(reader["CreatedOn"].ToString()),
-                            ManagerName = reader["ManagerName"].ToString(),
-                            UId = Guid.Parse(reader["UId"].ToString()),
-                            Name = reader["Name"].ToString(),
-                            Caption = reader["Caption"].ToString()
-                        };
+                    var sysSchema = SysSchemaRepository.CreateEntitySchema(reader);
 
-                        OnEntitiesCollectionUpdate(sysSchema);
-                    }
-                }
+                    OnEntitiesCollectionUpdate(sysSchema);
+                });
 
                 sqlExpression = "select * from SysSettingsValue ssv join SysSettings ss ON ss.Id=ssv.SysSettingsId where ss.Code='SiteUrl'";
-                command = new SqlCommand(sqlExpression, connection);
+                var command = new SqlCommand(sqlExpression, connection);
 
                 using (SqlDataReader reader = command.ExecuteReader())
                 {
@@ -244,14 +223,17 @@ namespace iProcessHelper
 
         private void AddFilterMethod(object obj)
         {
-            var addFilterWindow = new SelectWindow(Constants.filterTypes, App.Current.MainWindow);
+            var addFilterWindow = new SelectWindow(Constants.FilterTypes, App.Current.MainWindow);
             if (addFilterWindow.ShowDialog() == true)
             {
                 if (addFilterWindow.SelectedItem is FilterType filterType)
                 {
                     var filter = Activator.CreateInstance(Type.GetType($"iProcessHelper.Models.{filterType.Name}"));
+
                     if (filter is ProcessSchemaStartSignalEvent startSignal)
+                    {
                         FilterObjects.Add(startSignal);
+                    }
                 }
             }
         }
@@ -280,10 +262,14 @@ namespace iProcessHelper
                     var result = true;
 
                     if (!string.IsNullOrEmpty(SearchedProcessName))
+                    {
                         result = process.SysSchema.Caption.Contains(SearchedProcessName) || process.SysSchema.Name.Contains(SearchedProcessName);
+                    }
 
                     if (FilterObjects.Any())
+                    {
                         result = result && this.GetFilterResult(process);
+                    }
 
                     process.IsVisible = result;
                 }
@@ -295,7 +281,9 @@ namespace iProcessHelper
             foreach (var obj in FilterObjects)
             {
                 if (!obj.Filter(process))
+                {
                     return false;
+                }
             }
             return true;
         }

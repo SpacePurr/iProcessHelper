@@ -86,6 +86,8 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="DBContexts\DBConnection.cs" />
+    <Compile Include="DBContexts\Repository\SysSchemaRepository.cs" />
+    <Compile Include="Helpers\BackgroundLoadFromDBService.cs" />
     <Compile Include="Helpers\CommonHelper.cs" />
     <Compile Include="Helpers\Constants.cs" />
     <Compile Include="Helpers\HierarchicalProcessTreeCreator.cs" />
