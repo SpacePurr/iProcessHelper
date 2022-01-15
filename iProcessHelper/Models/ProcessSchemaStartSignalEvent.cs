@@ -1,4 +1,5 @@
-﻿using iProcessHelper.DBContexts.DBModels;
+﻿using iProcessHelper.DBContexts;
+using iProcessHelper.DBContexts.DBModels;
 using iProcessHelper.Helpers;
 using iProcessHelper.JsonModels.JsonProcessModel;
 using iProcessHelper.JsonModels.JsonProcessModels;
@@ -24,7 +25,7 @@ namespace iProcessHelper.Models
             set 
             { 
                 entity = value;
-                using (SqlConnection connection = new SqlConnection("Data Source=localhost;Initial Catalog=Creatio_7;User Id='sa';Password='0'"))
+                using (SqlConnection connection = new SqlConnection(DBConnection.ConnectionString))
                 {
                     connection.Open();
                     string sqlExpression = 

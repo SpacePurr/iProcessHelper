@@ -93,7 +93,7 @@ namespace iProcessHelper
         private void DoWork(object sender, DoWorkEventArgs e)
         {
             this.OnProcessClear();
-            using (SqlConnection connection = new SqlConnection("Data Source=localhost;Initial Catalog=Creatio_7;User Id='sa';Password='0'"))
+            using (SqlConnection connection = new SqlConnection(DBConnection.ConnectionString))
             {
                 connection.Open();
 
@@ -159,7 +159,7 @@ namespace iProcessHelper
                     }
                 }
 
-                sqlExpression = "select * from SysSchema where ManagerName='EntitySchemaManager' and ParentId='af5f2299-b00d-4480-bd18-6e4b188ea0ab' order by Caption";
+                sqlExpression = "SELECT * FROM VwSysSchemaInfo where ManagerName='EntitySchemaManager' ORDER BY Caption";
                 command = new SqlCommand(sqlExpression, connection);
 
                 using (SqlDataReader reader = command.ExecuteReader())

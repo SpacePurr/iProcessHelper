@@ -13,14 +13,10 @@ namespace iProcessHelper.Models
     public class ProcessTreeViewElement : NotifyPropertyChanged
     {
         private bool isVisible;
-
         public SysSchema SysSchema { get; set; }
-
         public bool IsVisible { get => isVisible; set { isVisible = value; OnPropertyChanged(); } }
-
         public ObservableCollection<ProcessTreeViewElement> Items { get; set; }
         public ProcessModel Json { get; set; }
-
 
         public ProcessTreeViewElement()
         {

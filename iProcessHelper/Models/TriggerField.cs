@@ -1,4 +1,5 @@
-﻿using iProcessHelper.DBContexts.DBModels;
+﻿using iProcessHelper.DBContexts;
+using iProcessHelper.DBContexts.DBModels;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -27,7 +28,7 @@ namespace iProcessHelper.Models
                 column = value;
                 if(Column.UId == Guid.Empty)
                 {
-                    using (SqlConnection connection = new SqlConnection("Data Source=localhost;Initial Catalog=Creatio_7;User Id='sa';Password='0'"))
+                    using (SqlConnection connection = new SqlConnection(DBConnection.ConnectionString))
                     {
                         connection.Open();
                         string sqlExpression =
