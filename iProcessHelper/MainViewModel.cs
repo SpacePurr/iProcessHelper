@@ -53,15 +53,16 @@ namespace iProcessHelper
         public ObservableCollection<FilterObject> FilterObjects { get; set; }
         public ObservableCollection<FilterType> FilterTypes { get; set; }
 
+        private ObservableCollection<SysSchema> Entities { get; set; }
+
         #region Events
 
-        private event Action<ProcessTreeViewElement> OnCollectionUpdate;
-        private event Action<ProcessTreeViewElement, ProcessTreeViewElement> OnChildCollectionUpdate;
+        private event Action<ProcessTreeViewElement> OnProcessesUpdate;
+        private event Action<ProcessTreeViewElement, ProcessTreeViewElement> OnChildProcessesUpdate;
         private event Action OnProcessClear;
-        private event Action<SysSchema> OnEntitiesCollectionUpdate;
+        private event Action<VwSysSchemaInfo> OnEntitiesUpdate;
 
         #endregion
-
 
         public MainViewModel()
         {
@@ -69,10 +70,10 @@ namespace iProcessHelper
 
             IsTreeLoading = false;
 
-            OnCollectionUpdate += MainViewModel_OnCollectionUpdate;
-            OnChildCollectionUpdate += MainViewModel_OnChildCollectionUpdate;
+            OnProcessesUpdate += MainViewModel_OnProcessesUpdate;
+            OnChildProcessesUpdate += MainViewModel_OnChildProcessesUpdate;
             OnProcessClear += MainViewModel_OnProcessClear;
-            OnEntitiesCollectionUpdate += MainViewModel_OnEntitiesCollectionUpdate;
+            OnEntitiesUpdate += MainViewModel_OnEntitiesUpdate;
 
             _worker = new BackgroundWorker
             {
@@ -86,51 +87,51 @@ namespace iProcessHelper
 
             FilterObjects = new ObservableCollection<FilterObject>();
             FilterTypes = Constants.FilterTypes;
+
+            Entities = new ObservableCollection<SysSchema>();
         }
 
-        private void MainViewModel_OnEntitiesCollectionUpdate(SysSchema obj)
+        private void MainViewModel_OnEntitiesUpdate(VwSysSchemaInfo obj)
         {
             Application.Current.Dispatcher.Invoke(() =>
             {
-                Constants.Entities.Add(obj);
+                Entities.Add(obj);
             });
         }
 
         private void RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
+            CurrentProgress = 0;
             IsTreeLoading = false;
         }
 
         private void DoWork(object sender, DoWorkEventArgs e)
         {
             this.OnProcessClear();
-            using (SqlConnection connection = new SqlConnection(DBConnection.ConnectionString))
-            {
-                connection.Open();
 
-                BackgroundLoadFromDBService.LoadParentProcesses(connection, _worker, OnCollectionUpdate);
-                BackgroundLoadFromDBService.LoadChildProcesses(connection, _worker, Processes, OnChildCollectionUpdate);
-                BackgroundLoadFromDBService.LoadEntities(connection, _worker, OnEntitiesCollectionUpdate);
+            BackgroundLoadFromDBService.LoadParentProcesses(_worker, OnProcessesUpdate);
+            BackgroundLoadFromDBService.LoadChildProcesses(_worker, Processes, OnChildProcessesUpdate);
+            BackgroundLoadFromDBService.LoadEntities(_worker, OnEntitiesUpdate);
 
-                var sqlExpression = "select * from SysSettingsValue ssv join SysSettings ss ON ss.Id=ssv.SysSettingsId where ss.Code='SiteUrl'";
-                var command = new SqlCommand(sqlExpression, connection);
+            this.LoadConstants();
 
-                using (SqlDataReader reader = command.ExecuteReader())
-                {
-                    if (reader.Read())
-                    {
-                        Constants.SiteUrl = reader["TextValue"].ToString();
-                    }
-                }
-
-                connection.Close();
-            }
-
-            CurrentProgress = 0;
+            Constants.Entities = Entities;
         }
+
         private void ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
             CurrentProgress = e.ProgressPercentage;
+        }
+
+        private void LoadConstants()
+        {
+            var context = new SysSettingsContext();
+
+            Constants.SiteUrl = context
+                .SysSettingsValues
+                .Where(x => x.SysSettings.Code == "SiteUrl")
+                .FirstOrDefault()
+                ?.TextValue;
         }
 
         private void MainViewModel_OnProcessClear()
@@ -140,14 +141,14 @@ namespace iProcessHelper
                 Processes.Clear();
             });
         }
-        private void MainViewModel_OnChildCollectionUpdate(ProcessTreeViewElement obj1, ProcessTreeViewElement obj2)
+        private void MainViewModel_OnChildProcessesUpdate(ProcessTreeViewElement obj1, ProcessTreeViewElement obj2)
         {
             Application.Current.Dispatcher.Invoke(() =>
             {
                 obj1.Items.Add(obj2);
             });
         }
-        private void MainViewModel_OnCollectionUpdate(ProcessTreeViewElement obj)
+        private void MainViewModel_OnProcessesUpdate(ProcessTreeViewElement obj)
         {
             Application.Current.Dispatcher.Invoke(() =>
             {

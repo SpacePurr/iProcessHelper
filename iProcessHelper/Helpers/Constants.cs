@@ -13,7 +13,7 @@ namespace iProcessHelper.Helpers
     {
         public static string SiteUrl;
 
-        public static ObservableCollection<SysSchema> Entities => new ObservableCollection<SysSchema>();
+        public static ObservableCollection<SysSchema> Entities { get; set; }
 
         public static List<EntitySignal> EntitySignals => new List<EntitySignal>
         {

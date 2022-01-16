@@ -25,30 +25,19 @@ namespace iProcessHelper.Models
             set 
             { 
                 entity = value;
-                using (SqlConnection connection = new SqlConnection(DBConnection.ConnectionString))
+
+                var context = new InfromationSchemaColumnsContext();
+
+                var columns = context.AllInformationSchemaColumns.Where(x => x.TABLE_NAME == Entity.Name);
+
+                foreach (var column in columns)
                 {
-                    connection.Open();
-                    string sqlExpression = 
-                        "SELECT COLUMN_NAME, DATA_TYPE " +
-                        "FROM INFORMATION_SCHEMA.COLUMNS " +
-                        $"WHERE TABLE_NAME = N'{Entity.Name}' " +
-                        "order by COLUMN_NAME";
-
-                    SqlCommand command = new SqlCommand(sqlExpression, connection);
-                    using (SqlDataReader reader = command.ExecuteReader())
+                    var entityColumns = new EntityColumn
                     {
-                        while (reader.Read())
-                        {
-                            var column = new EntityColumn
-                            {
-                                Name = reader["COLUMN_NAME"].ToString(),
-                                DataType = ColumnType.Parse(reader["DATA_TYPE"].ToString())
-                            };
-                            Columns.Add(column);
-                        }
-                    }
-
-                    connection.Close();
+                        Name = column.COLUMN_NAME,
+                        DataType = ColumnType.Parse(column.DATA_TYPE)
+                    };
+                    Columns.Add(entityColumns);
                 }
             } 
         }
