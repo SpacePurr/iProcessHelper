@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30907.101
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "iProcessHelper", "iProcessHelper\iProcessHelper.csproj", "{0689C115-3926-4F77-89F7-ED2A20B3CF50}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "iProcessHelper", "iProcessHelper\iProcessHelper_NetCore.csproj", "{0689C115-3926-4F77-89F7-ED2A20B3CF50}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
