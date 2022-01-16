@@ -14,7 +14,7 @@ namespace iProcessHelper.DBContexts
         public DbSet<InformationSchemaColumns> InformationSchemaColumns { get; set; }
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlServer(ConfigurationManager.ConnectionStrings["Database"].ConnectionString);
+            optionsBuilder.UseNpgsql(ConfigurationManager.ConnectionStrings["Database"].ConnectionString);
         }
     }
 }

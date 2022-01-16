@@ -18,7 +18,7 @@ namespace iProcessHelper.Helpers
         {
             using (var stream = new MemoryStream(data))
             {
-                using (var reader = new StreamReader(stream, Encoding.UTF8))
+                using (var reader = new StreamReader(stream))
                 {
                     return JsonSerializer.Create().Deserialize(reader, typeof(T)) as T;
                 }

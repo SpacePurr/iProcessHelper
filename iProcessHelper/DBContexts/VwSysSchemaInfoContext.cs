@@ -12,7 +12,7 @@ namespace iProcessHelper.DBContexts
         public DbSet<VwSysSchemaInfo> VwSysSchemaInfos { get; set; }
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlServer(ConfigurationManager.ConnectionStrings["Database"].ConnectionString);
+            optionsBuilder.UseNpgsql(ConfigurationManager.ConnectionStrings["Database"].ConnectionString);
         }
     }
 }

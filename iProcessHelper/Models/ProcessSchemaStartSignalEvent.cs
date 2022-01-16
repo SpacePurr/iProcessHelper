@@ -28,14 +28,14 @@ namespace iProcessHelper.Models
 
                 var context = new InfromationSchemaColumnsContext();
 
-                var columns = context.AllInformationSchemaColumns.Where(x => x.TABLE_NAME == Entity.Name);
+                var columns = context.AllInformationSchemaColumns.Where(x => x.table_name == Entity.Name);
 
                 foreach (var column in columns)
                 {
                     var entityColumns = new EntityColumn
                     {
-                        Name = column.COLUMN_NAME,
-                        DataType = ColumnType.Parse(column.DATA_TYPE)
+                        Name = column.column_name,
+                        DataType = ColumnType.Parse(column.data_type)
                     };
                     Columns.Add(entityColumns);
                 }
@@ -138,27 +138,28 @@ namespace iProcessHelper.Models
 
                             JToken value;
 
-                            if(el["rightExpressions"] != null)
+                            if(el["rightExpression"] != null)
                             {
-                                var rightExpressionArray = JArray.Parse(el["rightExpressions"].ToString());
-                                foreach (var exprValue in rightExpressionArray)
-                                {
-                                    if (exprValue["parameter"]["dataValueType"].ToString() == "10")
-                                        columnPath += "Id";
+                                var rightExpression = el["rightExpression"];
 
-                                    var filterField = FilterFields.FirstOrDefault(ff => ff.Column.Name == columnPath.ToString());
-                                    if (filterField != null && filterField.OperationType.Value == int.Parse(comparisonType.ToString()) && filterField.IsValid(exprValue["parameter"]["value"].ToString()))
-                                        searchCount++;
-                                }
+                                //var rightExpressionArray = JArray.Parse(el["rightExpression"].ToString());
+                                var parameter = rightExpression["parameter"];
+
+                                if (parameter["dataValueType"].ToString() == "10")
+                                    columnPath += "Id";
+
+                                var filterField = FilterFields.FirstOrDefault(ff => ff.Column.Name == columnPath.ToString());
+                                if (filterField != null && filterField.OperationType.Value == int.Parse(comparisonType.ToString()) && filterField.IsValid(parameter["value"].ToString()))
+                                    searchCount++;
                             }
-                            else
+                            /*else
                             {
                                 value = el["rightExpression"]["parameter"]["value"];
 
                                 var filterField = FilterFields.FirstOrDefault(ff => ff.Column.Name == columnPath.ToString());
                                 if (filterField != null && filterField.OperationType.Value == int.Parse(comparisonType.ToString()) && filterField.IsValid(value.ToString()))
                                     searchCount++;
-                            }
+                            }*/
                         }
                     }
 

@@ -9,8 +9,8 @@ namespace iProcessHelper.DBContexts.DBModels
     class InformationSchemaColumns
     {
         [Key]
-        public string COLUMN_NAME { get; set; }
-        public string DATA_TYPE { get; set; }
-        public string TABLE_NAME { get; set; }
+        public string column_name { get; set; }
+        public string data_type { get; set; }
+        public string table_name { get; set; }
     }
 }
