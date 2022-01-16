@@ -108,58 +108,11 @@ namespace iProcessHelper
             {
                 connection.Open();
 
-                string sqlExpression;
-                int count;
+                BackgroundLoadFromDBService.LoadParentProcesses(connection, _worker, OnCollectionUpdate);
+                BackgroundLoadFromDBService.LoadChildProcesses(connection, _worker, Processes, OnChildCollectionUpdate);
+                BackgroundLoadFromDBService.LoadEntities(connection, _worker, OnEntitiesCollectionUpdate);
 
-                sqlExpression = "select COUNT(Id) as RowsCount from SysSchema where ManagerName='ProcessSchemaManager' and ParentId is null";
-                count = BackgroundLoadFromDBService.GetCount(connection, sqlExpression);
-
-                sqlExpression = "select * from SysSchema where ManagerName='ProcessSchemaManager' and ParentId is null order by Caption";
-                BackgroundLoadFromDBService.Load(connection, _worker, count, sqlExpression, (reader) =>
-                {
-                    var sysSchema = SysSchemaRepository.CreateProcessSchema(reader);
-
-                    var json = MetadataParser.Deserialize<ProcessModel>(sysSchema.MetaData);
-                    OnCollectionUpdate(new ProcessTreeViewElement
-                    {
-                        SysSchema = sysSchema,
-                        Json = json
-                    });
-                });
-
-                sqlExpression = "select COUNT(Id) as RowsCount from SysSchema where ManagerName='ProcessSchemaManager' and ParentId is not null";
-                count = BackgroundLoadFromDBService.GetCount(connection, sqlExpression);
-
-                sqlExpression = "select * from SysSchema where ManagerName='ProcessSchemaManager' and ParentId is not null order by Caption";
-                BackgroundLoadFromDBService.Load(connection, _worker, count, sqlExpression, (reader) =>
-                {
-                    var sysSchema = SysSchemaRepository.CreateProcessSchema(reader);
-
-                    var parent = Processes.FirstOrDefault(e1 => e1.SysSchema.Id == sysSchema.ParentId);
-
-                    if (parent != null)
-                    {
-                        var json = MetadataParser.Deserialize<ProcessModel>(sysSchema.MetaData);
-                        OnChildCollectionUpdate(parent, new ProcessTreeViewElement
-                        {
-                            SysSchema = sysSchema,
-                            Json = json
-                        });
-                    }
-                });
-
-                sqlExpression = "select COUNT(Id) as RowsCount from VwSysSchemaInfo where ManagerName='EntitySchemaManager'";
-                count = BackgroundLoadFromDBService.GetCount(connection, sqlExpression);
-
-                sqlExpression = "SELECT * FROM VwSysSchemaInfo where ManagerName='EntitySchemaManager' ORDER BY Caption";
-                BackgroundLoadFromDBService.Load(connection, _worker, count, sqlExpression, (reader) =>
-                {
-                    var sysSchema = SysSchemaRepository.CreateEntitySchema(reader);
-
-                    OnEntitiesCollectionUpdate(sysSchema);
-                });
-
-                sqlExpression = "select * from SysSettingsValue ssv join SysSettings ss ON ss.Id=ssv.SysSettingsId where ss.Code='SiteUrl'";
+                var sqlExpression = "select * from SysSettingsValue ssv join SysSettings ss ON ss.Id=ssv.SysSettingsId where ss.Code='SiteUrl'";
                 var command = new SqlCommand(sqlExpression, connection);
 
                 using (SqlDataReader reader = command.ExecuteReader())
